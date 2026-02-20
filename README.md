@@ -1,4 +1,4 @@
-# DSAL Lab Repository
+# DSAL Repository
 
 **Department of Computer Science – UET Lahore**
 
