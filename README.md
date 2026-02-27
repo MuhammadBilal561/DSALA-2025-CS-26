@@ -12,7 +12,7 @@ This repository contains my **Data Structures and Algorithms Lab (DSAL)** tasks,
 * **Department:** Computer Science
 * **University:** UET Lahore
 * **Language(s):** C++ (primary)
-* **Semester:** *(add your semester here)*
+* **Semester:** 3rd
 
 ---
 
