@@ -1,0 +1,5 @@
+TABLE Course
+id int 7
+name string 2
+DATA
+1 DSAL
