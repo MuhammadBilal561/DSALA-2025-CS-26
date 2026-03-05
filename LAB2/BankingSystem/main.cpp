@@ -1,7 +1,4 @@
-// ========================================================
-//  SECURE FILE-BASED BANKING SYSTEM
-//  Simple Single-File Version for 3rd Semester Students
-// ========================================================
+//2025(S)-CS-26
 
 #include <iostream>
 #include <fstream>
@@ -9,43 +6,25 @@
 #include <vector>
 using namespace std;
 
-// --------------------------------------------------------
 // PERMISSION FLAGS (Bitwise)
-//
-// Think of permissions as ON/OFF switches stored in one number.
-//
-//   Bit:   3    2    1    0
-//          VIP  Transfer  Deposit  Withdraw
-//          8    4    2    1
-//
-//   Example: permissions = 7 means 0111 in binary
-//            = Withdraw(1) + Deposit(2) + Transfer(4)
-// --------------------------------------------------------
 
-const unsigned int PERM_WITHDRAW = 1;   // 0001
-const unsigned int PERM_DEPOSIT  = 2;   // 0010
-const unsigned int PERM_TRANSFER = 4;   // 0100
-const unsigned int PERM_VIP      = 8;   // 1000
 
-// --------------------------------------------------------
-// BASE CLASS: Account (Abstract)
-//
-// "Abstract" means you CANNOT create an object of this class
-// directly. You MUST use SavingsAccount or CurrentAccount.
-// The "= 0" makes a function "pure virtual".
-// --------------------------------------------------------
+const unsigned int PERM_WITHDRAW = 1;   
+const unsigned int PERM_DEPOSIT  = 2;   
+const unsigned int PERM_TRANSFER = 4;   
+const unsigned int PERM_VIP      = 8;   
+
+// ABSTRACT CLASS  
 
 class Account
 {
-protected:    // accessible in this class AND child classes
-    int accountId;
+protected:        int accountId;
     string name;
     double balance;
     unsigned int permissions;
-    vector<double> transactions;   // stores history
+    vector<double> transactions;   
 
 public:
-    // Constructor
     Account(int id, string n, double bal, unsigned int perms)
     {
         accountId = id;
@@ -54,7 +33,7 @@ public:
         permissions = perms;
     }
 
-    // Default constructor (needed for loading from file)
+    // Default 
     Account()
     {
         accountId = 0;
@@ -63,15 +42,13 @@ public:
         permissions = 0;
     }
 
-    // Pure virtual functions (child classes MUST override these)
     virtual void deposit(double amount) = 0;
     virtual void withdraw(double amount) = 0;
     virtual string getType() = 0;
 
-    // Virtual destructor (needed when using pointers)
+    // Virtual destructor 
     virtual ~Account() {}
 
-    // --- Simple Getters ---
     int getId()               { return accountId; }
     string getName()          { return name; }
     double getBalance()       { return balance; }
@@ -79,7 +56,6 @@ public:
 
     vector<double>& getTransactions() { return transactions; }
 
-    // --- Display Account Info ---
     void display()
     {
         cout << "\n  ================================" << endl;
@@ -89,14 +65,12 @@ public:
         cout << "  Balance     : Rs. " << balance << endl;
         cout << "  Permissions : " << permissions << " -> ";
 
-        // Check each permission using BITWISE AND
         if (permissions & PERM_WITHDRAW)  cout << "[Withdraw] ";
         if (permissions & PERM_DEPOSIT)   cout << "[Deposit] ";
         if (permissions & PERM_TRANSFER)  cout << "[Transfer] ";
         if (permissions & PERM_VIP)       cout << "[VIP] ";
         cout << endl;
 
-        // Show transaction history
         cout << "  Transactions: ";
         if (transactions.empty())
         {
@@ -119,10 +93,8 @@ public:
         cout << "  ================================" << endl;
     }
 
-    // --- Transfer money to another account ---
     void transferTo(Account* other, double amount)
     {
-        // Check transfer permission using BITWISE AND
         if (!(permissions & PERM_TRANSFER))
         {
             cout << "  [DENIED] You don't have Transfer permission!" << endl;
@@ -149,7 +121,6 @@ public:
              << " from " << name << " to " << other->name << endl;
     }
 
-    // --- Save this account to file ---
     void saveToFile(ofstream& out)
     {
         out << "ACCOUNT " << getType() << endl;
@@ -165,14 +136,13 @@ public:
         out << "END" << endl;
     }
 
-    // --- Load this account from file ---
     void loadFromFile(ifstream& in)
     {
         in >> accountId >> name >> balance >> permissions;
 
         string line;
-        getline(in, line);   // skip rest of current line
-        getline(in, line);   // read "TRANSACTIONS"
+        getline(in, line);   
+        getline(in, line); 
 
         transactions.clear();
 
@@ -183,25 +153,21 @@ public:
             if (line.empty())
                 continue;
 
-            double val = stod(line);   // string to double
+            double val = stod(line);  
             transactions.push_back(val);
         }
     }
 };
 
-// --------------------------------------------------------
-// CHILD CLASS 1: SavingsAccount
-// Inherits everything from Account.
-// Adds interest calculation.
-// --------------------------------------------------------
+
 
 class SavingsAccount : public Account
 {
 public:
     SavingsAccount(int id, string n, double bal, unsigned int perms)
-        : Account(id, n, bal, perms) {}     // call parent constructor
+        : Account(id, n, bal, perms) {}    
 
-    SavingsAccount() : Account() {}          // default
+    SavingsAccount() : Account() {}          
 
     ~SavingsAccount() {}
 
@@ -212,7 +178,6 @@ public:
 
     void deposit(double amount)
     {
-        // BITWISE AND to check permission
         if (!(permissions & PERM_DEPOSIT))
         {
             cout << "  [DENIED] Deposit not allowed!" << endl;
@@ -225,14 +190,13 @@ public:
         }
 
         balance += amount;
-        transactions.push_back(amount);    // positive = deposit
+        transactions.push_back(amount);   
         cout << "  [OK] Deposited Rs. " << amount
              << " | Balance: Rs. " << balance << endl;
     }
 
     void withdraw(double amount)
     {
-        // BITWISE AND to check permission
         if (!(permissions & PERM_WITHDRAW))
         {
             cout << "  [DENIED] Withdraw not allowed!" << endl;
@@ -250,26 +214,20 @@ public:
         }
 
         balance -= amount;
-        transactions.push_back(-amount);   // negative = withdrawal
+        transactions.push_back(-amount);  
         cout << "  [OK] Withdrew Rs. " << amount
              << " | Balance: Rs. " << balance << endl;
     }
 
-    // BONUS: Interest
     void applyInterest()
     {
-        double interest = balance * 0.05;   // 5%
+        double interest = balance * 0.05;  
         balance += interest;
         transactions.push_back(interest);
         cout << "  [OK] Interest Rs. " << interest << " added!" << endl;
     }
 };
 
-// --------------------------------------------------------
-// CHILD CLASS 2: CurrentAccount
-// Inherits from Account.
-// Adds overdraft (can go negative up to a limit).
-// --------------------------------------------------------
 
 class CurrentAccount : public Account
 {
@@ -280,7 +238,7 @@ public:
     CurrentAccount(int id, string n, double bal, unsigned int perms)
         : Account(id, n, bal, perms)
     {
-        overdraftLimit = 1000;   // can go Rs.1000 below zero
+        overdraftLimit = 1000;   
     }
 
     CurrentAccount() : Account()
@@ -327,7 +285,6 @@ public:
             return;
         }
 
-        // Overdraft: allow balance to go negative up to limit
         if ((balance - amount) < -overdraftLimit)
         {
             cout << "  [ERROR] Exceeds overdraft limit of Rs. "
@@ -343,17 +300,12 @@ public:
 };
 
 
-// ========================================================
-//  GLOBAL VARIABLES
-// ========================================================
-
-vector<Account*> accounts;   // stores ALL accounts as pointers
-int nextId = 1001;           // auto-increment ID
 
 
-// ========================================================
-//  HELPER: Find account by ID
-// ========================================================
+vector<Account*> accounts;   
+int nextId = 1001;           
+
+
 
 Account* findAccount(int id)
 {
@@ -366,9 +318,6 @@ Account* findAccount(int id)
 }
 
 
-// ========================================================
-//  FUNCTION: Create Account
-// ========================================================
 
 void createAccount()
 {
@@ -389,7 +338,6 @@ void createAccount()
     cout << "  Enter initial balance: ";
     cin >> balance;
 
-    // BUILD PERMISSIONS USING BITWISE OR
     unsigned int perms = 0;
 
     cout << "  Allow Withdraw? (y/n): ";
@@ -412,7 +360,6 @@ void createAccount()
     if (ch == 'y' || ch == 'Y')
         perms = perms | PERM_VIP;          // turns ON bit 3
 
-    // DYNAMIC MEMORY: create object with 'new'
     // Store as Account* (base class pointer) = POLYMORPHISM
     Account* newAcc = NULL;
 
@@ -430,9 +377,7 @@ void createAccount()
 }
 
 
-// ========================================================
-//  FUNCTION: Deposit
-// ========================================================
+
 
 void doDeposit()
 {
@@ -456,9 +401,7 @@ void doDeposit()
 }
 
 
-// ========================================================
-//  FUNCTION: Withdraw
-// ========================================================
+
 
 void doWithdraw()
 {
@@ -482,9 +425,7 @@ void doWithdraw()
 }
 
 
-// ========================================================
-//  FUNCTION: Transfer
-// ========================================================
+
 
 void doTransfer()
 {
@@ -512,9 +453,7 @@ void doTransfer()
 }
 
 
-// ========================================================
-//  FUNCTION: Show Account
-// ========================================================
+
 
 void showAccount()
 {
@@ -533,9 +472,7 @@ void showAccount()
 }
 
 
-// ========================================================
-//  FUNCTION: Show All Accounts
-// ========================================================
+
 
 void showAll()
 {
@@ -552,9 +489,7 @@ void showAll()
 }
 
 
-// ========================================================
-//  FUNCTION: Save All Accounts to File
-// ========================================================
+
 
 void saveToFile()
 {
@@ -578,9 +513,7 @@ void saveToFile()
 }
 
 
-// ========================================================
-//  FUNCTION: Load All Accounts from File
-// ========================================================
+
 
 void loadFromFile()
 {
@@ -592,7 +525,6 @@ void loadFromFile()
         return;
     }
 
-    // First delete old accounts to avoid MEMORY LEAK
     for (int i = 0; i < accounts.size(); i++)
     {
         delete accounts[i];
@@ -605,7 +537,7 @@ void loadFromFile()
     for (int i = 0; i < count; i++)
     {
         string word, type;
-        in >> word >> type;    // reads "ACCOUNT" and "Savings"/"Current"
+        in >> word >> type;    
 
         Account* acc = NULL;
 
@@ -617,7 +549,6 @@ void loadFromFile()
         acc->loadFromFile(in);
         accounts.push_back(acc);
 
-        // Keep nextId updated
         if (acc->getId() >= nextId)
             nextId = acc->getId() + 1;
     }
@@ -627,24 +558,19 @@ void loadFromFile()
 }
 
 
-// ========================================================
-//  FUNCTION: Monthly Summary (Uses C-Style Arrays)
-// ========================================================
+
 
 void monthlySummary()
 {
-    // REQUIREMENT: Must use arrays
     double deposits[12];
     double withdrawals[12];
 
-    // Initialize to zero
     for (int i = 0; i < 12; i++)
     {
         deposits[i] = 0;
         withdrawals[i] = 0;
     }
 
-    // Spread transactions across months (round-robin)
     for (int i = 0; i < accounts.size(); i++)
     {
         vector<double>& txns = accounts[i]->getTransactions();
@@ -682,21 +608,17 @@ void monthlySummary()
 }
 
 
-// ========================================================
-//  FUNCTION: Transaction Compression Demo (Bitwise)
-// ========================================================
 
 void compressionDemo()
 {
     cout << "\n  === TRANSACTION COMPRESSION DEMO ===" << endl;
     cout << "  (Packing type + amount into one number)\n" << endl;
 
-    // ENCODE: shift type left 28 bits, OR with amount
     unsigned int type1 = 1;      // 1 = Deposit
     unsigned int amount1 = 5000;
     unsigned int encoded1 = (type1 << 28) | (amount1 & 0x0FFFFFFF);
 
-    // DECODE: shift right to get type, mask to get amount
+
     unsigned int decodedType1   = encoded1 >> 28;
     unsigned int decodedAmount1 = encoded1 & 0x0FFFFFFF;
 
@@ -707,8 +629,7 @@ void compressionDemo()
 
     cout << endl;
 
-    // Another example: Withdrawal of 2500
-    unsigned int type2 = 2;      // 2 = Withdrawal
+    unsigned int type2 = 2;      
     unsigned int amount2 = 2500;
     unsigned int encoded2 = (type2 << 28) | (amount2 & 0x0FFFFFFF);
 
@@ -724,9 +645,7 @@ void compressionDemo()
 }
 
 
-// ========================================================
-//  FUNCTION: Cleanup Memory
-// ========================================================
+
 
 void cleanupMemory()
 {
@@ -739,9 +658,7 @@ void cleanupMemory()
 }
 
 
-// ========================================================
-//  MAIN FUNCTION
-// ========================================================
+
 
 int main()
 {
@@ -782,7 +699,7 @@ int main()
             case 9:  monthlySummary();   break;
             case 10: compressionDemo();  break;
             case 0:
-                cout << "\n  Goodbye! Cleaning up memory..." << endl;
+                cout << "\n  Cleaning up memory..." << endl;
                 break;
             default:
                 cout << "  Invalid choice!" << endl;
