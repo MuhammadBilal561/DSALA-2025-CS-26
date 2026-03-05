@@ -1,7 +1,6 @@
 TABLE users
 id int 7
 name string 2
-age int 2
+password string 2
 DATA
-1 Ali 20
-2 Bilal 20
+1 user1 123

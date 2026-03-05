@@ -1,0 +1,6 @@
+TABLE students
+name string 2
+rollNo string 6
+degree string 2
+DATA
+bilal 26 CS
